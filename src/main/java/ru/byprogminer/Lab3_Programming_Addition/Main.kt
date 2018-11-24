@@ -22,29 +22,45 @@ SOFTWARE. */
 
 package ru.byprogminer.Lab3_Programming_Addition
 
-import java.awt.Color
-import java.awt.Dimension
+import java.awt.*
 
-import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JFrame
 
-const val APP_NAME = "Lab3 Addition"
+const val APP_NAME = "Lab3 Programming Addition"
+const val APP_VERSION = "1.0"
 
-private val startWindow = JFrame(APP_NAME)
+private val startWindow = JFrame("$APP_NAME $APP_VERSION")
 
 fun main() {
     startWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     startWindow.isResizable = false
 
-    val startPanel = StartPanel(::start)
+    val startPanel = StartPanel(3, ::start)
 
-    startPanel.border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
     startWindow.contentPane = startPanel
 
     startWindow.pack()
     startWindow.minimumSize = startWindow.size
+
+    centerWindow(startWindow)
     startWindow.isVisible = true
+}
+
+fun Double.fixNaN(fallback: Double = 1.0) = when {
+    this.isNaN() -> fallback
+    else         -> this
+}
+
+private fun centerWindow(window: JFrame) {
+    val centerPoint = GraphicsEnvironment.getLocalGraphicsEnvironment().centerPoint
+
+    window.bounds = Rectangle(
+            centerPoint.x - window.width / 2,
+            centerPoint.y - window.height / 2,
+            window.width,
+            window.height
+    )
 }
 
 private fun start(width: Int, height: Int) {
@@ -52,15 +68,16 @@ private fun start(width: Int, height: Int) {
 
     var game = Game(width, height)
 
-    val gameWindow = JFrame(APP_NAME)
+    val gameWindow = JFrame("$APP_NAME $APP_VERSION")
     gameWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    gameWindow.setLocationRelativeTo(null)
     gameWindow.isFocusable = true
 
     var gameController = game.Controller()
     gameWindow.addKeyListener(gameController)
 
     val resetButton = JButton("Reset")
-    resetButton.setBounds(10, 10, 100, 25)
+    resetButton.bounds = Rectangle(Point(10, 10), resetButton.preferredSize)
 
     val gamePanelRegen = {
         val gamePanel = game.Panel()
@@ -90,17 +107,13 @@ private fun start(width: Int, height: Int) {
         newGame()
     }
 
-    gameWindow.rootPane.preferredSize = Dimension(120, 45)
+    gameWindow.rootPane.preferredSize = Dimension(20 + resetButton.width, 20 + resetButton.height)
     gameWindow.pack()
     gameWindow.minimumSize = gameWindow.size
 
     gameWindow.rootPane.preferredSize = Dimension(640, 480)
     gameWindow.pack()
 
+    centerWindow(gameWindow)
     gameWindow.isVisible = true
-}
-
-fun Double.fixNaN(fallback: Double = 1.0) = when {
-    this.isNaN() -> fallback
-    else         -> this
 }

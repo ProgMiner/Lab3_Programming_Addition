@@ -35,7 +35,7 @@ import javax.swing.JPanel
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-class Game(val size: Dimension, private val seed: Long = System.currentTimeMillis()) {
+class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
 
     enum class Block {
 
@@ -316,11 +316,11 @@ class Game(val size: Dimension, private val seed: Long = System.currentTimeMilli
     constructor(x: Int, y: Int, seed: Long): this(Dimension(x, y), seed)
 
     init {
-        makePath()
-        clean()
+        makePath(seed)
+        clean(seed)
     }
 
-    private fun makePath() {
+    private fun makePath(seed: Long) {
         val rand = Random(seed)
 
         while (true) {
@@ -353,7 +353,7 @@ class Game(val size: Dimension, private val seed: Long = System.currentTimeMilli
         gameOver = false
     }
 
-    private fun clean() {
+    private fun clean(seed: Long) {
         val rand = Random(seed)
 
         for (y in 1 until (size.height - 1)) {

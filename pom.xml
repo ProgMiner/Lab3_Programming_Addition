@@ -6,7 +6,7 @@
 
     <groupId>ru.byprogminer</groupId>
     <artifactId>Lab3_Programming_Addition</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <kotlin.version>1.3.10</kotlin.version>

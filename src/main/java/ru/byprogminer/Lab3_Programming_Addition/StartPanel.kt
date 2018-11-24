@@ -29,7 +29,10 @@ import java.awt.event.ActionEvent
 
 import javax.swing.*
 
-class StartPanel(private val callback: (Int, Int) -> Unit): JPanel(GridBagLayout()) {
+class StartPanel(
+        gap: Int = 2,
+        private val callback: (Int, Int) -> Unit
+): JPanel(GridBagLayout()) {
 
     private val widthLabel = JLabel("Width:", JLabel.RIGHT)
     private val widthField = JTextField("20", 5)
@@ -38,6 +41,8 @@ class StartPanel(private val callback: (Int, Int) -> Unit): JPanel(GridBagLayout
     private val startButton = JButton("Start game")
 
     init {
+        border = BorderFactory.createEmptyBorder(gap, gap, gap, gap)
+
         val font = font.deriveFont(20F)
 
         widthLabel.font = font
@@ -52,11 +57,11 @@ class StartPanel(private val callback: (Int, Int) -> Unit): JPanel(GridBagLayout
 
         heightField.font = font
         heightField.addActionListener(this::actionPerformed)
-        add(heightField, GridBagConstraints(1, 1, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(2, 0, 0, 0), 0, 0))
+        add(heightField, GridBagConstraints(1, 1, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
 
         startButton.font = font
         startButton.addActionListener(this::actionPerformed)
-        add(startButton, GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, Insets(2, 0, 0, 0), 0, 0))
+        add(startButton, GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
     }
 
     private fun actionPerformed(event: ActionEvent) {

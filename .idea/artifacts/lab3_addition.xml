@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="lab3_addition">
+    <output-path>$PROJECT_DIR$/out/artifacts/lab3_addition</output-path>
+    <root id="archive" name="lab3_addition.jar">
+      <element id="module-output" name="Lab3_Programming_Addition" />
+      <element id="library" level="project" name="KotlinJavaRuntime" />
+    </root>
+  </artifact>
+</component>

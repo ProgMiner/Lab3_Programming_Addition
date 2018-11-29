@@ -30,6 +30,7 @@ import java.awt.event.KeyEvent
 import java.awt.image.BufferedImage
 
 import javax.imageio.ImageIO
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 
 import kotlin.math.roundToInt
@@ -240,7 +241,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
             }
 
             if (graphics is Graphics2D) {
-                graphics.paint = GradientPaint(0F, (height - coefHeight + coef).toFloat(), Color(0, 0, 0, 0), 0F, height.toFloat(), Color(0, 0, 0, 200))
+                graphics.paint = GradientPaint(0F, (height - coefHeight + coef).toFloat(), Color(0, 0, 0, 0), 0F, height.toFloat(), Color(0, 0, 0, 170))
                 graphics.fillRect(0, height - coefHeight, coefWidth, coefHeight)
             }
         }
@@ -269,14 +270,19 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
                 playerX = newPlayerX
 
             } else if (
-                    newPlayerX >= 0 && newPlayerX < this@Game.size.width &&
-                    newPlayerY >= 0 && newPlayerY < this@Game.size.height &&
+                    newPlayerX in 0 until this@Game.size.width &&
+                    newPlayerY in 0 until this@Game.size.height &&
                     blocks[newPlayerY][newPlayerX].canStand()
             ) {
                 playerX = newPlayerX
                 playerY = newPlayerY
 
                 blocks[newPlayerY][newPlayerX].onStand(this@Game)
+
+                if (gameOver) {
+                    event.component.repaint()
+                    JOptionPane.showMessageDialog(null, "You win!", "$APP_NAME $APP_VERSION", JOptionPane.INFORMATION_MESSAGE)
+                }
             }
 
             event.component.repaint()

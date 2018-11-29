@@ -69,8 +69,8 @@ class StartPanel(
             val width = widthField.text.toInt()
             val height = heightField.text.toInt()
 
-            if (width <= 0 || height <= 0) {
-                JOptionPane.showMessageDialog(this, "Width and height must be positive integers!", APP_NAME, JOptionPane.WARNING_MESSAGE)
+            if (width !in 1..100 || height !in 1..100) {
+                JOptionPane.showMessageDialog(this, "Width and height must be in (0, 100]!", APP_NAME, JOptionPane.WARNING_MESSAGE)
                 return
             }
 

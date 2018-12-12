@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
-package ru.byprogminer.Lab3_Programming_Addition
+package ru.byprogminer.Lab_Programming_Addition
 
 import java.awt.*
 import java.awt.event.ComponentAdapter

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.byprogminer</groupId>
-    <artifactId>Lab3_Programming_Addition</artifactId>
+    <artifactId>Lab_Programming_Addition</artifactId>
     <version>1.1</version>
 
     <properties>
@@ -23,7 +23,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>ru.byprogminer.Lab3_Programming_Addition.MainKt</mainClass>
+                            <mainClass>ru.byprogminer.Lab_Programming_Addition.MainKt</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

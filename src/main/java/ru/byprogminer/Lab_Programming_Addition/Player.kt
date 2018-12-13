@@ -1,10 +1,15 @@
 package ru.byprogminer.Lab_Programming_Addition
 
+import java.awt.Component
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.image.BufferedImage
+
+import java.util.*
+
 import javax.imageio.ImageIO
 import javax.swing.JOptionPane
+
 import kotlin.random.Random
 
 open class Player(
@@ -23,21 +28,55 @@ open class Player(
 
     inner class Controller: KeyAdapter() {
 
+        private fun winMessage(component: Component, message: Any) {
+            JOptionPane.showMessageDialog(component, message, "$APP_NAME $APP_VERSION", JOptionPane.INFORMATION_MESSAGE)
+        }
+
         private fun move(event: KeyEvent) {
             val game = game!!
-            val gameOver = game.gameOver
+            val gameState = game.state
 
             move(when (event.keyCode) {
-                KeyEvent.VK_UP    -> Direction.UP
+                KeyEvent.VK_UP -> Direction.UP
                 KeyEvent.VK_RIGHT -> Direction.RIGHT
-                KeyEvent.VK_DOWN  -> Direction.DOWN
-                KeyEvent.VK_LEFT  -> Direction.LEFT
+                KeyEvent.VK_DOWN -> Direction.DOWN
+                KeyEvent.VK_LEFT -> Direction.LEFT
                 else -> return
             })
 
-            if (!gameOver && game.gameOver) {
-                event.component.repaint()
-                JOptionPane.showMessageDialog(null, "You win!", "$APP_NAME $APP_VERSION", JOptionPane.INFORMATION_MESSAGE)
+            if (game.state != Game.State.AFTER || gameState == Game.State.AFTER) {
+                return
+            }
+
+            event.component.repaint()
+
+            val players = game.players
+            if (players.size == 1) {
+                winMessage(event.component, "You win!")
+            } else {
+                val sortedPlayers = TreeMap<Int, Player>(Comparator.reverseOrder())
+
+                for (player in players) {
+                    sortedPlayers[player.y] = player
+                }
+
+                val msgBuilder = StringBuilder("Player ")
+                        .append(sortedPlayers[sortedPlayers.firstKey()]!!.name)
+                        .append(" win!\n")
+
+                var counter = 0
+                for ((playerY, player) in sortedPlayers) {
+                    msgBuilder
+                            .append('\n')
+                            .append(++counter)
+                            .append(". ")
+                            .append(player.name)
+                            .append(" (")
+                            .append(playerY)
+                            .append(')')
+                }
+
+                winMessage(event.component, msgBuilder)
             }
         }
 
@@ -66,23 +105,20 @@ open class Player(
     var rotation = 1
         private set
 
-    constructor(game: Game): this() {
-        this.game = game
-    }
-
-    constructor(name: String, game: Game): this(name) {
-        this.game = game
-    }
-
     fun move(direction: Direction) {
         val game = game!!
+
+        if (game.state == Game.State.BEFORE) {
+            return
+        }
+
         var newX = x
         var newY = y
 
         newX += direction.x
         newY += direction.y
 
-        if (game.gameOver && newX in 0 until game.size.width) {
+        if (game.state == Game.State.AFTER && newX in 0 until game.size.width) {
             x = newX
 
         } else if (
@@ -117,6 +153,11 @@ open class Player(
 
     fun fall() {
         val game = game!!
+
+        if (game.state == Game.State.BEFORE) {
+            return
+        }
+
         var playerY = y
 
         if (playerY == 0) {
@@ -142,4 +183,6 @@ open class Player(
     }
 
     open fun getTexture() = defaultTexture
+
+    override fun toString() = name
 }

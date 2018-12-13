@@ -24,10 +24,17 @@ package ru.byprogminer.Lab_Programming_Addition
 
 import java.awt.Dimension
 import java.awt.image.BufferedImage
+
 import javax.imageio.ImageIO
+
 import kotlin.random.Random
 
 class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
+
+    enum class State {
+
+        BEFORE, GAME, AFTER
+    }
 
     enum class Block {
 
@@ -38,7 +45,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
             private val texture: BufferedImage = ImageIO.read(javaClass.getResourceAsStream("/assets/images/blocks/ground.png"))
 
             override fun onStand(player: Player) {
-                player.game!!.gameOver = true
+                player.game!!.stop()
             }
 
             override fun getTexture() = texture
@@ -120,7 +127,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
 
     private val _players = mutableSetOf<Player>()
 
-    var gameOver = false
+    var state = State.BEFORE
         private set
 
     constructor(x: Int, y: Int): this(Dimension(x, y))
@@ -132,13 +139,53 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
     }
 
     fun joinPlayer(player: Player) {
+        if (_players.contains(player)) {
+            throw IllegalArgumentException("Player is already joined")
+        }
+
+        if (state != State.BEFORE) {
+            throw RuntimeException("Joining after game start is not permitted")
+        }
+
         player.game = this
 
         _players.add(player)
     }
 
     fun leavePlayer(player: Player) {
+        if (!_players.contains(player)) {
+            throw IllegalArgumentException("Player isn't joined")
+        }
+
         _players.remove(player)
+
+        if (state == State.GAME && _players.isEmpty()) {
+            stop()
+        }
+    }
+
+    fun start() {
+        if (state != State.BEFORE) {
+            throw RuntimeException("Game is already started")
+        }
+
+        if (_players.isEmpty()) {
+            throw RuntimeException("Cannot start game without players")
+        }
+
+        state = State.GAME
+    }
+
+    fun stop() {
+        if (state == State.BEFORE) {
+            throw RuntimeException("Game isn't started")
+        }
+
+        if (state == State.AFTER) {
+            throw RuntimeException("Game is already stopped")
+        }
+
+        state = State.AFTER
     }
 
     private fun makePath(seed: Long) {

@@ -115,9 +115,13 @@ class GamePanel(game: Game): JPanel() {
             graphics.fillRect(0, 0, coefWidth, height)
         }
 
-        val players = mutableMapOf<Int, Pair<Int, Player>>()
+        val players = mutableMapOf<Int, MutableSet<Pair<Int, Player>>>()
         for (player in game.players) {
-            players[player.y] = player.x to player
+            val set = players[player.y] ?: mutableSetOf()
+
+            set.add(player.x to player)
+
+            players[player.y] = set
         }
 
         for (y in maxY downTo 0) {
@@ -136,13 +140,15 @@ class GamePanel(game: Game): JPanel() {
 
             graphics.drawImage(objectsBuffer[y]!!, 0, offset - coef, coefWidth, coef, null)
 
-            val (playerX, player) = players[y] ?: 0 to null
-            if (player != null) {
-                if (playersBuffer[player] == null) {
-                    regenBuffers(coef)
-                }
+            val playersSet = players[y]
+            if (playersSet != null) {
+                for ((playerX, player) in playersSet) {
+                    if (playersBuffer[player] == null) {
+                        regenBuffers(coef)
+                    }
 
-                graphics.drawImage(playersBuffer[player]!!, coef * (playerX - (player.rotation - 1) / 2), offset - coef, coef * player.rotation, coef, this)
+                    graphics.drawImage(playersBuffer[player]!!, coef * (playerX - (player.rotation - 1) / 2), offset - coef, coef * player.rotation, coef, this)
+                }
             }
         }
 

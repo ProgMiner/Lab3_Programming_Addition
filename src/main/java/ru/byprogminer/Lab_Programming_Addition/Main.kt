@@ -75,6 +75,7 @@ private fun start(width: Int, height: Int) {
 
     var player = Player()
     game.joinPlayer(player)
+    // game.joinPlayer(Player())
 
     var gameController = player.Controller()
     gameWindow.addKeyListener(gameController)
@@ -91,6 +92,7 @@ private fun start(width: Int, height: Int) {
 
     gameWindow.contentPane = gamePanel
     gameWindow.revalidate()
+    game.start()
 
     resetButton.addActionListener {
         gameWindow.removeKeyListener(gameController)
@@ -104,6 +106,7 @@ private fun start(width: Int, height: Int) {
         gameWindow.addKeyListener(gameController)
 
         gamePanel.game = game
+        game.start()
     }
 
     gameWindow.rootPane.preferredSize = Dimension(20 + resetButton.width, 20 + resetButton.height)

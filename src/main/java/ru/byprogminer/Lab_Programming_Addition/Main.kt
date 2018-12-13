@@ -28,7 +28,7 @@ import javax.swing.JButton
 import javax.swing.JFrame
 
 const val APP_NAME = "Lab3 Programming Addition"
-const val APP_VERSION = "1.0"
+const val APP_VERSION = "2.0-SNAPSHOT"
 
 private val startWindow = JFrame("$APP_NAME $APP_VERSION")
 
@@ -66,45 +66,44 @@ private fun centerWindow(window: JFrame) {
 private fun start(width: Int, height: Int) {
     startWindow.isVisible = false
 
-    var game = Game(width, height)
-
     val gameWindow = JFrame("$APP_NAME $APP_VERSION")
     gameWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     gameWindow.setLocationRelativeTo(null)
     gameWindow.isFocusable = true
 
-    var gameController = game.Controller()
+    var game = Game(width, height)
+
+    var player = Player()
+    game.joinPlayer(player)
+
+    var gameController = player.Controller()
     gameWindow.addKeyListener(gameController)
 
-    val resetButton = JButton("Reset")
+    val resetButton = JButton("New game")
     resetButton.bounds = Rectangle(Point(10, 10), resetButton.preferredSize)
+    resetButton.isFocusable = false
 
-    val gamePanelRegen = {
-        val gamePanel = game.Panel()
-        gamePanel.background = Color.BLACK
-        gamePanel.layout = null
+    val gamePanel = GamePanel(game)
+    gamePanel.background = Color.BLACK
+    gamePanel.layout = null
 
-        gamePanel.add(resetButton)
+    gamePanel.add(resetButton)
 
-        gameWindow.contentPane = gamePanel
-        gameWindow.revalidate()
+    gameWindow.contentPane = gamePanel
+    gameWindow.revalidate()
 
-        gamePanel
-    }
-    gamePanelRegen()
-
-    val newGame = {
+    resetButton.addActionListener {
         gameWindow.removeKeyListener(gameController)
 
         game = Game(width, height)
 
-        gamePanelRegen()
-        gameController = game.Controller()
-        gameWindow.addKeyListener(gameController)
-    }
+        player = Player()
+        game.joinPlayer(player)
 
-    resetButton.addActionListener {
-        newGame()
+        gameController = player.Controller()
+        gameWindow.addKeyListener(gameController)
+
+        gamePanel.game = game
     }
 
     gameWindow.rootPane.preferredSize = Dimension(20 + resetButton.width, 20 + resetButton.height)

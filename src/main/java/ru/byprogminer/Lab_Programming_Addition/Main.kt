@@ -23,14 +23,17 @@ SOFTWARE. */
 package ru.byprogminer.Lab_Programming_Addition
 
 import java.awt.*
+import java.util.*
 
 import javax.swing.JButton
 import javax.swing.JFrame
+import javax.swing.JOptionPane
 
 const val APP_NAME = "Lab Programming Addition"
 const val APP_VERSION = "2.0-SNAPSHOT"
 
 private val startWindow = JFrame("$APP_NAME $APP_VERSION")
+private val gameWindow = JFrame("$APP_NAME $APP_VERSION")
 
 fun main() {
     startWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
@@ -66,18 +69,18 @@ private fun centerWindow(window: JFrame) {
 private fun start(width: Int, height: Int) {
     startWindow.isVisible = false
 
-    val gameWindow = JFrame("$APP_NAME $APP_VERSION")
     gameWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     gameWindow.setLocationRelativeTo(null)
     gameWindow.isFocusable = true
 
     var game = Game(width, height)
+    game.callbacks[Game.State.AFTER] = ::gameOver
 
     var player = Player()
     game.joinPlayer(player)
     // game.joinPlayer(Player())
 
-    var gameController = player.Controller()
+    var gameController = KeyPlayerController(player)
     gameWindow.addKeyListener(gameController)
 
     val resetButton = JButton("New game")
@@ -98,11 +101,12 @@ private fun start(width: Int, height: Int) {
         gameWindow.removeKeyListener(gameController)
 
         game = Game(width, height)
+        game.callbacks[Game.State.AFTER] = ::gameOver
 
         player = Player()
         game.joinPlayer(player)
 
-        gameController = player.Controller()
+        gameController = KeyPlayerController(player)
         gameWindow.addKeyListener(gameController)
 
         gamePanel.game = game
@@ -118,4 +122,41 @@ private fun start(width: Int, height: Int) {
 
     centerWindow(gameWindow)
     gameWindow.isVisible = true
+}
+
+private fun winMessage(message: Any) {
+    JOptionPane.showMessageDialog(gameWindow, message, "$APP_NAME $APP_VERSION", JOptionPane.INFORMATION_MESSAGE)
+}
+
+private fun gameOver(game: Game) {
+    val players = game.players
+
+    gameWindow.repaint()
+    if (players.size == 1) {
+        winMessage("You win!")
+    } else {
+        val sortedPlayers = TreeMap<Int, Player>(Comparator.reverseOrder())
+
+        for (player in players) {
+            sortedPlayers[player.y] = player
+        }
+
+        val msgBuilder = StringBuilder("Player ")
+                .append(sortedPlayers[sortedPlayers.firstKey()]!!.name)
+                .append(" win!\n")
+
+        var counter = 0
+        for ((playerY, player) in sortedPlayers) {
+            msgBuilder
+                    .append('\n')
+                    .append(++counter)
+                    .append(". ")
+                    .append(player.name)
+                    .append(" (")
+                    .append(playerY)
+                    .append(')')
+        }
+
+        winMessage(msgBuilder)
+    }
 }

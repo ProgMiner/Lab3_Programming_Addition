@@ -108,6 +108,11 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         }
     }
 
+    var state = State.BEFORE
+        private set
+
+    val callbacks = mutableMapOf<State, (Game) -> Unit>()
+
     val players: Set<Player> = mutableSetOf()
         get() {
             for (player in field) {
@@ -126,9 +131,6 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         }
 
     private val _players = mutableSetOf<Player>()
-
-    var state = State.BEFORE
-        private set
 
     constructor(x: Int, y: Int): this(Dimension(x, y))
     constructor(x: Int, y: Int, seed: Long): this(Dimension(x, y), seed)
@@ -174,6 +176,12 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         }
 
         state = State.GAME
+
+        for (player in _players) {
+            blocks[0][0].onStand(player)
+        }
+
+        callbacks[state]?.invoke(this)
     }
 
     fun stop() {
@@ -186,6 +194,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         }
 
         state = State.AFTER
+        callbacks[state]?.invoke(this)
     }
 
     private fun makePath(seed: Long) {

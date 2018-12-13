@@ -27,8 +27,8 @@ import java.awt.*
 import javax.swing.JButton
 import javax.swing.JFrame
 
-const val APP_NAME = "Lab3 Programming Addition"
-const val APP_VERSION = "1.0"
+const val APP_NAME = "Lab Programming Addition"
+const val APP_VERSION = "1.1"
 
 private val startWindow = JFrame("$APP_NAME $APP_VERSION")
 

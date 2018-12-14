@@ -66,7 +66,7 @@ private fun centerWindow(window: JFrame) {
     )
 }
 
-private fun start(width: Int, height: Int) {
+private fun start(width: Int, height: Int, gameMode: StartPanel.GameMode) {
     startWindow.isVisible = false
 
     gameWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

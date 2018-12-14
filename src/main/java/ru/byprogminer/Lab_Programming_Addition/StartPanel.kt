@@ -31,9 +31,21 @@ import javax.swing.*
 
 class StartPanel(
         gap: Int = 2,
-        private val callback: (Int, Int) -> Unit
+        private val callback: (Int, Int, GameMode) -> Unit
 ): JPanel(GridBagLayout()) {
 
+    enum class GameMode(val text: String) {
+
+        SINGLEPLAYER("Singleplayer"), ONE_COMPUTER("One computer"), MULTIPLAYER("Multiplayer");
+
+        override fun toString() = text
+    }
+
+    var widthRange = 1..100
+    var heightRange = 1..100
+
+    private val gamemodeLable = JLabel("Game mode:", JLabel.RIGHT)
+    private val gamemodeComboBox = JComboBox<GameMode>(GameMode.values())
     private val widthLabel = JLabel("Width:", JLabel.RIGHT)
     private val widthField = JTextField("20", 5)
     private val heightLabel = JLabel("Height:", JLabel.RIGHT)
@@ -45,23 +57,29 @@ class StartPanel(
 
         val font = font.deriveFont(20F)
 
+        gamemodeLable.font = font
+        add(gamemodeLable, GridBagConstraints(0, 0, 1, 1, .0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 5), 0, 0))
+
+        gamemodeComboBox.font = font
+        add(gamemodeComboBox, GridBagConstraints(1, 0, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
+
         widthLabel.font = font
-        add(widthLabel, GridBagConstraints(0, 0, 1, 1, .0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 5), 0, 0))
+        add(widthLabel, GridBagConstraints(0, 1, 1, 1, .0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 5), 0, 0))
 
         widthField.font = font
         widthField.addActionListener(this::actionPerformed)
-        add(widthField, GridBagConstraints(1, 0, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
+        add(widthField, GridBagConstraints(1, 1, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
 
         heightLabel.font = font
-        add(heightLabel, GridBagConstraints(0, 1, 1, 1, .0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 5), 0, 0))
+        add(heightLabel, GridBagConstraints(0, 2, 1, 1, .0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 5), 0, 0))
 
         heightField.font = font
         heightField.addActionListener(this::actionPerformed)
-        add(heightField, GridBagConstraints(1, 1, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
+        add(heightField, GridBagConstraints(1, 2, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
 
         startButton.font = font
         startButton.addActionListener(this::actionPerformed)
-        add(startButton, GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
+        add(startButton, GridBagConstraints(0, 3, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
     }
 
     private fun actionPerformed(event: ActionEvent) {
@@ -69,12 +87,24 @@ class StartPanel(
             val width = widthField.text.toInt()
             val height = heightField.text.toInt()
 
-            if (width !in 1..100 || height !in 1..100) {
-                JOptionPane.showMessageDialog(this, "Width and height must be in (0, 100]!", APP_NAME, JOptionPane.WARNING_MESSAGE)
+            if (width !in widthRange) {
+                JOptionPane.showMessageDialog(this, "Width must be in [${widthRange.first}, ${widthRange.last}]!", APP_NAME, JOptionPane.WARNING_MESSAGE)
                 return
             }
 
-            callback(width, height)
+            if (height !in heightRange) {
+                JOptionPane.showMessageDialog(this, "Height must be in [${heightRange.first}, ${heightRange.last}]!", APP_NAME, JOptionPane.WARNING_MESSAGE)
+                return
+            }
+
+            val gameMode = gamemodeComboBox.getItemAt(gamemodeComboBox.selectedIndex)
+
+            if (gameMode == null) {
+                JOptionPane.showMessageDialog(this, "Select a game mode, please", APP_NAME, JOptionPane.WARNING_MESSAGE)
+                return
+            }
+
+            callback(width, height, gameMode)
         } catch (e: NumberFormatException) {
             JOptionPane.showMessageDialog(this, "${e.javaClass.canonicalName}: ${e.localizedMessage}", APP_NAME, JOptionPane.ERROR_MESSAGE)
 

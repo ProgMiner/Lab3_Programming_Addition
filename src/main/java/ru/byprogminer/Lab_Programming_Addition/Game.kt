@@ -46,7 +46,9 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
             private val texture: BufferedImage = ImageIO.read(javaClass.getResourceAsStream("/assets/images/blocks/ground.png"))
 
             override fun onStand(player: Player) {
-                player.game!!.stop()
+                try {
+                    player.game!!.stop()
+                } catch (ex: RuntimeException) {}
             }
 
             override fun getTexture() = texture

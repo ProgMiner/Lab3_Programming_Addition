@@ -51,7 +51,7 @@ open class Player(
         newX += direction.x
         newY += direction.y
 
-        if (game.state == Game.State.AFTER && newX in 0 until game.size.width) {
+        if (y == game.size.height - 1 && newX in 0 until game.size.width) {
             x = newX
 
         } else if (

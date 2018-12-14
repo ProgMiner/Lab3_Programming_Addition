@@ -1,19 +1,46 @@
+/* MIT License
+
+Copyright (c) 2018 Eridan Domoratskiy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. */
+
 package ru.byprogminer.Lab_Programming_Addition
 
-import ru.byprogminer.Lab_Programming_Addition.StartPanel.GameMode
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.KeyListener
-
 import java.util.*
-import javax.swing.JButton
 
+import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 
 class GameStarter {
+
+    enum class GameMode(val text: String) {
+
+        SINGLEPLAYER("Singleplayer"), ONE_COMPUTER("One computer") /*, MULTIPLAYER("Multiplayer")*/;
+
+        override fun toString() = text
+    }
 
     var width = 0
         private set
@@ -60,9 +87,9 @@ class GameStarter {
     fun makeCallback(startWindow: JFrame) = { width: Int, height: Int, gameMode: GameMode ->
         init(width, height, gameMode)
 
-        if (gameMode != GameMode.MULTIPLAYER) {
+        // if (gameMode != GameMode.MULTIPLAYER) {
             start()
-        }
+        // }
 
         startWindow.isVisible = false
     }

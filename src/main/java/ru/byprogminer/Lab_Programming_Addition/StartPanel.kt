@@ -31,21 +31,14 @@ import javax.swing.*
 
 class StartPanel(
         gap: Int = 2,
-        private val callback: (Int, Int, GameMode) -> Unit
+        private val callback: (Int, Int, GameStarter.GameMode) -> Unit
 ): JPanel(GridBagLayout()) {
-
-    enum class GameMode(val text: String) {
-
-        SINGLEPLAYER("Singleplayer"), ONE_COMPUTER("One computer"), MULTIPLAYER("Multiplayer");
-
-        override fun toString() = text
-    }
 
     var widthRange = 1..100
     var heightRange = 1..100
 
     private val gamemodeLable = JLabel("Game mode:", JLabel.RIGHT)
-    private val gamemodeComboBox = JComboBox<GameMode>(GameMode.values())
+    private val gamemodeComboBox = JComboBox<GameStarter.GameMode>(GameStarter.GameMode.values())
     private val widthLabel = JLabel("Width:", JLabel.RIGHT)
     private val widthField = JTextField("20", 5)
     private val heightLabel = JLabel("Height:", JLabel.RIGHT)

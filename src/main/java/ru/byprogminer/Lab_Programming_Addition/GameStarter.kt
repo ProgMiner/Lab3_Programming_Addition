@@ -75,9 +75,6 @@ class GameStarter {
         keyListeners.forEach { gameWindow.removeKeyListener(it) }
         keyListeners.clear()
 
-        val players = mutableSetOf<Player>()
-        players.addAll(game.players)
-
         initGame()
 
         gamePanel.game = game

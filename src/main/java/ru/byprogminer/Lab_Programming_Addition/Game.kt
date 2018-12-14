@@ -24,6 +24,7 @@ package ru.byprogminer.Lab_Programming_Addition
 
 import java.awt.Dimension
 import java.awt.image.BufferedImage
+import java.util.*
 
 import javax.imageio.ImageIO
 
@@ -91,6 +92,9 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         open fun getObjectsTexture(coef: Int) = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
     }
 
+    val blocks: Array<out Array<Block>>
+        get() = Arrays.copyOf(_blocks, _blocks.size)
+
     /**
      * ^ Y
      * | . . . . .
@@ -100,7 +104,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
      * | . . . . . X
      * +----------->
      */
-    val blocks = Array(size.height) { y ->
+    private val _blocks = Array(size.height) { y ->
         when (y) {
             size.height - 1 -> Array(size.width) { Block.GROUND }
             0               -> Array(size.width) { Block.NORMAL }
@@ -113,22 +117,8 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
 
     val callbacks = mutableMapOf<State, (Game) -> Unit>()
 
-    val players: Set<Player> = mutableSetOf()
-        get() {
-            for (player in field) {
-                if (!_players.contains(player)) {
-                    (field as MutableSet).remove(player)
-                }
-            }
-
-            for (player in _players) {
-                if (!field.contains(player)) {
-                    (field as MutableSet).add(player)
-                }
-            }
-
-            return field
-        }
+    val players
+        get() = _players.toSet()
 
     private val _players = mutableSetOf<Player>()
 
@@ -178,7 +168,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         state = State.GAME
 
         for (player in _players) {
-            blocks[0][0].onStand(player)
+            _blocks[0][0].onStand(player)
         }
 
         callbacks[state]?.invoke(this)
@@ -197,13 +187,16 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         callbacks[state]?.invoke(this)
     }
 
+    fun getBlockAt(x: Int, y: Int) =
+            _blocks[y][x]
+
     private fun makePath(seed: Long) {
         val rand = Random(seed)
 
         var x = 0
         var y = 0
         while (y < size.height - 1) {
-            blocks[y][x] = Block.NORMAL
+            _blocks[y][x] = Block.NORMAL
 
             when (rand.nextInt(4)) {
                 0 -> if (x < size.width - 1) ++x
@@ -219,11 +212,11 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
 
         for (y in 1 until (size.height - 1)) {
             for (x in 0 until size.width) {
-                if (blocks[y][x] != Block.STONE) {
+                if (_blocks[y][x] != Block.STONE) {
                     continue
                 }
 
-                blocks[y][x] = when (rand.nextInt(10)) {
+                _blocks[y][x] = when (rand.nextInt(10)) {
                     0    -> Block.STONE
                     1    -> Block.DIRT
                     else -> Block.NORMAL

@@ -62,7 +62,7 @@ class GamePanel(game: Game): JPanel() {
             val graphics = newTilesBuffer.graphics
 
             for (x in 0 until game.size.width) {
-                graphics.drawImage(game.blocks[y][x].getTexture(), coef * x, 0, coef, coef, null)
+                graphics.drawImage(game.getBlockAt(x, y).getTexture(), coef * x, 0, coef, coef, null)
             }
 
             tilesBuffer[y] = newTilesBuffer
@@ -75,7 +75,7 @@ class GamePanel(game: Game): JPanel() {
 
             var newObjectsBuffer = BufferedImage(coefWidth, 1, BufferedImage.TYPE_INT_ARGB)
             for (x in game.blocks[y].indices) {
-                val objects = game.blocks[y][x].getObjectsTexture(coef)
+                val objects = game.getBlockAt(x, y).getObjectsTexture(coef)
 
                 if (objects.height > newObjectsBuffer.height) {
                     val newObjectsBuffer2 = BufferedImage(coefWidth, objects.height, BufferedImage.TYPE_INT_ARGB)

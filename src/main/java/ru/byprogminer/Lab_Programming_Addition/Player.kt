@@ -57,12 +57,12 @@ open class Player(
         } else if (
                 newX in 0 until game.size.width &&
                 newY in 0 until game.size.height &&
-                game.blocks[newY][newX].canStand()
+                game.getBlockAt(newX, newY).canStand()
         ) {
             x = newX
             y = newY
 
-            game.blocks[newY][newX].onStand(this)
+            game.getBlockAt(newX, newY).onStand(this)
         }
 
         /**
@@ -101,7 +101,7 @@ open class Player(
         for (i in 0 until height) {
             --playerY
 
-            if (!game.blocks[playerY][x].canStand()) {
+            if (!game.getBlockAt(x, playerY).canStand()) {
                 if (i == 0) {
                     return
                 }
@@ -112,7 +112,7 @@ open class Player(
             y = playerY
         }
 
-        game.blocks[y][x].onStand(this)
+        game.getBlockAt(x, y).onStand(this)
     }
 
     open fun getTexture() = defaultTexture

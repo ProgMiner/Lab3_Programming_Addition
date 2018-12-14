@@ -1,18 +1,30 @@
 package ru.byprogminer.Lab_Programming_Addition
 
+import ru.byprogminer.Lab_Programming_Addition.Player.Direction
+
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 
-import ru.byprogminer.Lab_Programming_Addition.Player.Direction
-
 class KeyPlayerController(player: Player): PlayerController(player), KeyListener {
 
-    val bindings = mutableMapOf<Int, Any>(
-            KeyEvent.VK_UP    to Direction.UP,
-            KeyEvent.VK_LEFT  to Direction.LEFT,
-            KeyEvent.VK_DOWN  to Direction.DOWN,
-            KeyEvent.VK_RIGHT to Direction.RIGHT
-    )
+    companion object {
+
+        val DEFAULT_BINDINGS = mapOf(
+                KeyEvent.VK_UP    to Direction.UP,
+                KeyEvent.VK_LEFT  to Direction.LEFT,
+                KeyEvent.VK_DOWN  to Direction.DOWN,
+                KeyEvent.VK_RIGHT to Direction.RIGHT
+        )
+
+        val SECOND_PLAYER_BINDINGS = mapOf(
+                KeyEvent.VK_W to Direction.UP,
+                KeyEvent.VK_A to Direction.LEFT,
+                KeyEvent.VK_S to Direction.DOWN,
+                KeyEvent.VK_D to Direction.RIGHT
+        )
+    }
+
+    var bindings = DEFAULT_BINDINGS
 
     private fun move(event: KeyEvent) {
         val binding = (bindings[event.keyCode] ?: return) as? Direction ?: return

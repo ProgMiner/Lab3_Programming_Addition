@@ -90,20 +90,24 @@ class GameStarter {
 
         when (gameMode) {
             GameMode.ONE_COMPUTER -> {
-                val player1 = Player("Player1")
+                val player1 = Player("Player 1")
                 game.joinPlayer(player1)
 
                 val controller1 = KeyPlayerController(player1)
+                controller1.bindings = KeyPlayerController.WASD_BINDINGS
                 gameWindow.addKeyListener(controller1)
                 keyListeners.add(controller1)
 
-                val player2 = Player("Player2")
+                val player2 = Player("Player 2")
                 game.joinPlayer(player2)
 
                 val controller2 = KeyPlayerController(player2)
-                controller2.bindings = KeyPlayerController.SECOND_PLAYER_BINDINGS
+                val controller3 = KeyPlayerController(player2)
+                controller3.bindings = KeyPlayerController.HJKL_BINDINGS
                 gameWindow.addKeyListener(controller2)
+                gameWindow.addKeyListener(controller3)
                 keyListeners.add(controller2)
+                keyListeners.add(controller3)
             }
 
             else -> {

@@ -23,89 +23,15 @@ SOFTWARE. */
 package ru.byprogminer.Lab_Programming_Addition
 
 import java.awt.Dimension
-import java.awt.image.BufferedImage
 import java.util.*
-
-import javax.imageio.ImageIO
 
 import kotlin.random.Random
 
-class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
+open class Game(size: Dimension, seed: Long = System.currentTimeMillis()): AbstractGame(size) {
 
-    enum class State {
-
-        BEFORE, GAME, AFTER
-    }
-
-    enum class Block {
-
-        NORMAL,
-
-        GROUND {
-
-            private val texture: BufferedImage = ImageIO.read(javaClass.getResourceAsStream("/assets/images/blocks/ground.png"))
-
-            override fun onStand(player: Player) {
-                try {
-                    player.game!!.stop()
-                } catch (ex: RuntimeException) {}
-            }
-
-            override fun getTexture() = texture
-        },
-
-        STONE {
-
-            private val stone: BufferedImage = ImageIO.read(javaClass.getResourceAsStream("/assets/images/blocks/stone.png"))
-
-            override fun canStand() = false
-
-            override fun getObjectsTexture(coef: Int): BufferedImage {
-                val ret = BufferedImage(coef, stone.height * coef / stone.width, BufferedImage.TYPE_INT_ARGB)
-                ret.graphics.drawImage(stone, 0, 0, ret.width, ret.height, null)
-
-                return ret
-            }
-        },
-
-        DIRT {
-
-            private val texture: BufferedImage = ImageIO.read(javaClass.getResourceAsStream("/assets/images/blocks/dirt.png"))
-
-            override fun onStand(player: Player) {
-                player.fall()
-            }
-
-            override fun getTexture() = texture
-        };
-
-        private val texture: BufferedImage = ImageIO.read(javaClass.getResourceAsStream("/assets/images/blocks/normal.png"))
-
-        open fun canStand() = true
-
-        open fun onStand(player: Player) {
-            if (Random(System.currentTimeMillis()).nextInt(10) == 0) {
-                player.fall()
-            }
-        }
-
-        open fun getTexture() = texture
-
-        open fun getObjectsTexture(coef: Int) = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
-    }
-
-    val blocks: Array<out Array<Block>>
+    override val blocks: Array<out Array<Block>>
         get() = Arrays.copyOf(_blocks, _blocks.size)
 
-    /**
-     * ^ Y
-     * | . . . . .
-     * | . . . . .
-     * | . . . . .
-     * | . . . . .
-     * | . . . . . X
-     * +----------->
-     */
     private val _blocks = Array(size.height) { y ->
         when (y) {
             size.height - 1 -> Array(size.width) { Block.GROUND }
@@ -114,15 +40,13 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         }
     }
 
-    var state = State.BEFORE
-        private set
+    override var state = State.BEFORE
+        protected set
 
-    val callbacks = mutableMapOf<State, (Game) -> Unit>()
+    override val players
+        get() = _players.toList()
 
-    val players
-        get() = _players.toSet()
-
-    private val _players = mutableSetOf<Player>()
+    private val _players = mutableListOf<Player>()
 
     constructor(x: Int, y: Int): this(Dimension(x, y))
     constructor(x: Int, y: Int, seed: Long): this(Dimension(x, y), seed)
@@ -132,7 +56,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         clean(seed)
     }
 
-    fun joinPlayer(player: Player) {
+    override fun joinPlayer(player: Player) {
         if (_players.contains(player)) {
             throw IllegalArgumentException("Player is already joined")
         }
@@ -146,7 +70,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         _players.add(player)
     }
 
-    fun leavePlayer(player: Player) {
+    override fun leavePlayer(player: Player) {
         if (!_players.contains(player)) {
             throw IllegalArgumentException("Player isn't joined")
         }
@@ -158,7 +82,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         }
     }
 
-    fun start() {
+    override fun start() {
         if (state != State.BEFORE) {
             throw RuntimeException("Game is already started")
         }
@@ -176,7 +100,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         callbacks[state]?.invoke(this)
     }
 
-    fun stop() {
+    override fun stop() {
         if (state == State.BEFORE) {
             throw RuntimeException("Game isn't started")
         }
@@ -189,7 +113,7 @@ class Game(val size: Dimension, seed: Long = System.currentTimeMillis()) {
         callbacks[state]?.invoke(this)
     }
 
-    fun getBlockAt(x: Int, y: Int) =
+    override fun getBlockAt(x: Int, y: Int) =
             _blocks[y][x]
 
     private fun makePath(seed: Long) {

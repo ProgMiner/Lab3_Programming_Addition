@@ -42,7 +42,7 @@ open class Player(
         val defaultTexture: BufferedImage = ImageIO.read(this::class.java.getResourceAsStream("/assets/images/player.png"))
     }
 
-    var game: Game? = null
+    var game: AbstractGame? = null
         set(value) {
             if (field != null && value != field) {
                 throw RuntimeException("Change game of player is not permitted")
@@ -63,7 +63,7 @@ open class Player(
     fun move(direction: Direction) {
         val game = game!!
 
-        if (game.state == Game.State.BEFORE) {
+        if (game.state == AbstractGame.State.BEFORE) {
             return
         }
 
@@ -109,7 +109,7 @@ open class Player(
     fun fall() {
         val game = game!!
 
-        if (game.state == Game.State.BEFORE) {
+        if (game.state == AbstractGame.State.BEFORE) {
             return
         }
 

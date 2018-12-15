@@ -54,7 +54,7 @@ class GameStarter {
     val gameWindow = JFrame("$APP_NAME $APP_VERSION")
     lateinit var gamePanel: GamePanel
 
-    lateinit var game: Game
+    lateinit var game: AbstractGame
         private set
 
     private val keyListeners = mutableSetOf<KeyListener>()
@@ -110,7 +110,7 @@ class GameStarter {
 
     private fun initGame() {
         game = Game(width, height)
-        game.callbacks[Game.State.AFTER] = ::gameOver
+        game.callbacks[AbstractGame.State.AFTER] = ::gameOver
 
         when (gameMode) {
             GameMode.ONE_COMPUTER -> {
@@ -171,7 +171,7 @@ class GameStarter {
         centerWindow(gameWindow)
     }
 
-    private fun gameOver(game: Game) {
+    private fun gameOver(game: AbstractGame) {
         val players = game.players
 
         gameWindow.repaint()

@@ -34,7 +34,7 @@ import javax.swing.JPanel
 
 import kotlin.math.roundToInt
 
-class GamePanel(game: Game): JPanel() {
+class GamePanel(game: AbstractGame): JPanel() {
 
     var bottomHeightCoef = 0.4
     var skyColor: Color = Color.CYAN

@@ -24,6 +24,7 @@ package ru.byprogminer.Lab_Programming_Addition
 
 import java.awt.GraphicsEnvironment
 import java.awt.Rectangle
+import java.net.ServerSocket
 
 import javax.swing.JFrame
 
@@ -37,7 +38,23 @@ fun main() {
     startWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     startWindow.isResizable = false
 
-    val startPanel = StartPanel(3, gameStarter.makeCallback(startWindow))
+    val startPanel = StartPanel(3, gameStarter.makeCallback(startWindow) {
+        val gameServer = GameServer(gameStarter.game, ServerSocket(0xDED))
+
+        startWindow.isResizable = true
+        startWindow.contentPane = PlayersWaitPanel(3, gameServer) {
+            startWindow.isVisible = false
+
+            gameStarter.gameWindow.isVisible = true
+            gameStarter.start()
+        }
+
+        startWindow.revalidate()
+        startWindow.pack()
+        startWindow.minimumSize = startWindow.size
+
+        gameServer
+    })
 
     startWindow.contentPane = startPanel
 

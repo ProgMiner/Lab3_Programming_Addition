@@ -56,7 +56,7 @@ open class Game(size: Dimension, seed: Long = System.currentTimeMillis()): Abstr
         clean(seed)
     }
 
-    override fun joinPlayer(player: Player) {
+    override fun joinPlayer(player: Player): Int {
         if (_players.contains(player)) {
             throw IllegalArgumentException("Player is already joined")
         }
@@ -68,6 +68,7 @@ open class Game(size: Dimension, seed: Long = System.currentTimeMillis()): Abstr
         player.game = this
 
         _players.add(player)
+        return _players.indexOf(player)
     }
 
     override fun leavePlayer(player: Player) {
@@ -80,6 +81,10 @@ open class Game(size: Dimension, seed: Long = System.currentTimeMillis()): Abstr
         if (state == State.GAME && _players.isEmpty()) {
             stop()
         }
+    }
+
+    override fun leavePlayer(player: Int) {
+        leavePlayer(_players[player])
     }
 
     override fun start() {

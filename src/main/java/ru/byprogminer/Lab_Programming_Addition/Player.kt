@@ -60,6 +60,15 @@ open class Player(
     var rotation = 1
         private set
 
+    fun isClean() =
+            game == null && x == 0 && y == 0 && rotation == 1
+
+    fun syncWith(player: Player) {
+        x = player.x
+        y = player.y
+        rotation = player.rotation
+    }
+
     fun move(direction: Direction) {
         val game = game!!
 

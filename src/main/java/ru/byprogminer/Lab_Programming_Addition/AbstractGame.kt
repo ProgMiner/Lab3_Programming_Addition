@@ -111,8 +111,9 @@ abstract class AbstractGame(val size: Dimension) {
 
     abstract val players: List<Player>
 
-    abstract fun joinPlayer(player: Player)
+    abstract fun joinPlayer(player: Player): Int
     abstract fun leavePlayer(player: Player)
+    abstract fun leavePlayer(player: Int)
 
     abstract fun getBlockAt(x: Int, y: Int): Block
 

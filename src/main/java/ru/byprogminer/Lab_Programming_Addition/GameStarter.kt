@@ -27,6 +27,7 @@ import java.awt.Dimension
 import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.KeyListener
+import java.net.ServerSocket
 import java.util.*
 
 import javax.swing.JButton
@@ -37,7 +38,7 @@ class GameStarter {
 
     enum class GameMode(val text: String) {
 
-        SINGLEPLAYER("Singleplayer"), ONE_COMPUTER("One computer") /*, MULTIPLAYER("Multiplayer")*/;
+        SINGLEPLAYER("Singleplayer"), ONE_COMPUTER("One computer"), MULTIPLAYER("Multiplayer");
 
         override fun toString() = text
     }
@@ -55,6 +56,9 @@ class GameStarter {
     lateinit var gamePanel: GamePanel
 
     lateinit var game: AbstractGame
+        private set
+
+    lateinit var gameServer: GameServer
         private set
 
     private val keyListeners = mutableSetOf<KeyListener>()
@@ -77,21 +81,25 @@ class GameStarter {
         initGame()
         initGameWindow()
 
-        gameWindow.isVisible = true
+        if (gameMode != GameMode.MULTIPLAYER) {
+            gameWindow.isVisible = true
+        }
     }
 
     fun start() {
         game.start()
     }
 
-    fun makeCallback(startWindow: JFrame) = { width: Int, height: Int, gameMode: GameMode ->
+    fun makeCallback(startWindow: JFrame, multiplayerCallback: () -> GameServer) = { width: Int, height: Int, gameMode: GameMode ->
         init(width, height, gameMode)
 
-        // if (gameMode != GameMode.MULTIPLAYER) {
+        if (gameMode == GameMode.MULTIPLAYER) {
+            gameServer = multiplayerCallback()
+        } else {
             start()
-        // }
 
-        startWindow.isVisible = false
+            startWindow.isVisible = false
+        }
     }
 
     fun restart() {

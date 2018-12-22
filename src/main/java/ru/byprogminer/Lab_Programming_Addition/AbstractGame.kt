@@ -22,14 +22,15 @@ SOFTWARE. */
 
 package ru.byprogminer.Lab_Programming_Addition
 
-import java.awt.Dimension
 import java.awt.image.BufferedImage
 
 import javax.imageio.ImageIO
 
 import kotlin.random.Random
 
-abstract class AbstractGame(val size: Dimension) {
+import ru.byprogminer.Lab_Programming_Addition.util.Dimension
+
+abstract class AbstractGame {
 
     enum class State {
 
@@ -93,6 +94,8 @@ abstract class AbstractGame(val size: Dimension) {
         open fun getObjectsTexture(coef: Int) = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
     }
 
+    abstract val size: Dimension
+
     /**
      * ^ Y
      * | . . . . .
@@ -104,8 +107,7 @@ abstract class AbstractGame(val size: Dimension) {
      */
     abstract val blocks: Array<out Array<Block>>
 
-    abstract var state: State
-        protected set
+    abstract val state: State
 
     val callbacks = mutableMapOf<State, (AbstractGame) -> Unit>()
 

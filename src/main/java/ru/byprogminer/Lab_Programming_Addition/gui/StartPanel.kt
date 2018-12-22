@@ -24,7 +24,6 @@ package ru.byprogminer.Lab_Programming_Addition.gui
 
 import java.awt.*
 import java.awt.event.ItemEvent
-import java.lang.reflect.Field
 
 import javax.swing.*
 import javax.swing.border.CompoundBorder
@@ -32,6 +31,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 import ru.byprogminer.Lab_Programming_Addition.*
+import ru.byprogminer.Lab_Programming_Addition.util.Disabler
 
 class StartPanel(
         gap: Int,
@@ -83,39 +83,6 @@ class StartPanel(
     ) {
 
         override fun toString() = player.toString()
-    }
-
-    private class Disabler {
-
-        private lateinit var components: Map<Field, Boolean>
-
-        fun disableAll(obj: StartPanel) {
-            val components = mutableMapOf<Field, Boolean>()
-
-            for (field in obj::class.java.declaredFields) {
-                if (JComponent::class.java.isAssignableFrom(field.type)) {
-                    field.isAccessible = true
-                    components[field] = (field.get(obj) as JComponent).isEnabled
-                    (field.get(obj) as JComponent).isEnabled = false
-                    field.isAccessible = false
-                }
-            }
-
-            this.components = components
-        }
-
-        fun revert(obj: StartPanel) {
-            if (!this::components.isInitialized) {
-                throw RuntimeException("Components isn't initialized")
-            }
-
-            for ((field, value) in components) {
-                field.isAccessible = true
-                (field.get(obj) as JComponent).isEnabled = value
-                field.isAccessible = false
-            }
-
-        }
     }
 
     companion object {
@@ -220,15 +187,17 @@ class StartPanel(
 
         networkStartButton.isEnabled = false
         networkStartButton.addActionListener {
-            if (checkExceptionAndDisplay {
-                        callback(StartPanelEvent.ServerStartEvent(
-                                networkPortComboBox.selectedItem.toString().toInt(),
-                                networkAddressComboBox.selectedItem.toString()
-                        ))
-                    }) {
-                networkCheckBox.isEnabled = false
-                changeNetworkComponentsState(false)
-            }
+            Thread {
+                if (checkExceptionAndDisplay {
+                            callback(StartPanelEvent.ServerStartEvent(
+                                    networkPortComboBox.selectedItem.toString().toInt(),
+                                    networkAddressComboBox.selectedItem.toString()
+                            ))
+                        }) {
+                    networkCheckBox.isEnabled = false
+                    changeNetworkComponentsState(false)
+                }
+            }.start()
         }
         networkPanel.add(networkStartButton, GridBagConstraints(0, 2, 2, 1, 1.0, 2.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
         networkPanel.border = CompoundBorder(
@@ -247,14 +216,39 @@ class StartPanel(
         playersPanel.add(playersList, GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, Insets(0, 0, gap, 0), 0, 0))
 
         playersButtonsAddButton.addActionListener {
-            playersListModel.addElement(PlayerConfig(Player()))
+            var initalName = "Player"
+
+            if (playersListModel.size > 0) {
+                initalName += playersListModel.size
+            }
+
+            var name: String?
+
+            do {
+                name = JOptionPane.showInputDialog(this, "Input player name: ", "$APP_NAME $APP_VERSION", JOptionPane.QUESTION_MESSAGE, null, null, initalName)?.toString()
+
+                if (name == null) {
+                    return@addActionListener
+                }
+            } while (name?.isBlank() != false)
+
+            val playerConfig = PlayerConfig(Player(name))
+            playersListModel.addElement(playerConfig)
+            playersList.selectedIndex = playersListModel.indexOf(playerConfig)
         }
         playersButtonsPanel.add(playersButtonsAddButton, GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, Insets(0, 0, 0, gap), 0, 0))
 
         playersButtonsRemoveButton.isEnabled = false
         playersButtonsRemoveButton.addActionListener {
             if (playersList.selectedValue != null) {
+                val index = playersListModel.indexOf(playersList.selectedValue)
                 playersListModel.removeElement(playersList.selectedValue)
+
+                if (index > 0) {
+                    playersList.selectedIndex = index - 1
+                } else if (playersListModel.size > 0) {
+                    playersList.selectedIndex = 0
+                }
             }
         }
         playersButtonsPanel.add(playersButtonsRemoveButton, GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, Insets(0, 0, 0, gap), 0, 0))
@@ -300,6 +294,7 @@ class StartPanel(
         playersPlayerPanel.add(playersPlayerKeySchemeLabel, GridBagConstraints(0, 1, 1, 1, .0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, gap, gap), 0, 0))
 
         playersPlayerKeySchemeComboBox.isEnabled = false
+        playersPlayerKeySchemeComboBox.selectedItem = KeyScheme.ARROWS
         playersPlayerKeySchemeComboBox.addActionListener {
             val playerConfig = playersList.selectedValue ?: return@addActionListener
 
@@ -320,40 +315,42 @@ class StartPanel(
         add(mainTabbedPane, GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, Insets(0, 0, gap, 0), 0, 0))
 
         startButton.addActionListener {
-            val disabler = Disabler()
-            disabler.disableAll(this)
+            Thread {
+                val disabler = Disabler<StartPanel>()
+                disabler.disableAll(this)
 
-            if (!checkExceptionAndDisplay {
-                        val event = when (gameTypeComboBox.getItemAt(gameTypeComboBox.selectedIndex)) {
-                            gameTypePanels[newGamePanel] -> StartPanelEvent.GameStartEvent(
-                                    newGameDifficultyComboBox.getItemAt(newGameDifficultyComboBox.selectedIndex).difficulty,
-                                    newGameWidthTextField.text.toInt(),
-                                    newGameHeightTextField.text.toInt(),
-                                    run {
-                                        val players = mutableMapOf<Player, PlayerController>()
+                if (!checkExceptionAndDisplay {
+                            val event = when (gameTypeComboBox.getItemAt(gameTypeComboBox.selectedIndex)) {
+                                gameTypePanels[newGamePanel] -> StartPanelEvent.GameStartEvent(
+                                        newGameDifficultyComboBox.getItemAt(newGameDifficultyComboBox.selectedIndex).difficulty,
+                                        newGameWidthTextField.text.toInt(),
+                                        newGameHeightTextField.text.toInt(),
+                                        run {
+                                            val players = mutableMapOf<Player, PlayerController>()
 
-                                        for (playerConfig in playersListModel.elements()) {
-                                            players[playerConfig.player] = if (playerConfig.remote) {
-                                                TODO("SocketPlayerController")
-                                            } else {
-                                                KeyPlayerController(playerConfig.player, playerConfig.keyScheme.keys)
+                                            for (playerConfig in playersListModel.elements()) {
+                                                players[playerConfig.player] = if (playerConfig.remote) {
+                                                    TODO("SocketPlayerController")
+                                                } else {
+                                                    KeyPlayerController(playerConfig.player, playerConfig.keyScheme.keys)
+                                                }
                                             }
+
+                                            return@run players
                                         }
+                                )
+                                gameTypePanels[connectPanel] -> StartPanelEvent.ConnectEvent(
+                                        connectPortComboBox.selectedItem.toString().toInt(),
+                                        connectAddressTextField.text
+                                )
+                                else -> throw RuntimeException()
+                            }
 
-                                        return@run players
-                                    }
-                            )
-                            gameTypePanels[connectPanel] -> StartPanelEvent.ConnectEvent(
-                                    connectPortComboBox.selectedItem.toString().toInt(),
-                                    connectAddressTextField.text
-                            )
-                            else -> throw RuntimeException()
-                        }
-
-                        callback(event)
-                    }) {
-                disabler.revert(this)
-            }
+                            callback(event)
+                        }) {
+                    disabler.revert(this)
+                }
+            }.start()
         }
         add(startButton, GridBagConstraints(0, 1, 1, 1, 1.0, .0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
         border = BorderFactory.createEmptyBorder(gap, gap, gap, gap)
@@ -389,7 +386,7 @@ class StartPanel(
 
         if (state == null) {
             changePlayerListComponentsState(true)
-            changePlayerButtonsComponentsState(state)
+            changePlayerButtonsComponentsState(null)
             return
         }
 

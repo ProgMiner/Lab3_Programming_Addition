@@ -40,25 +40,26 @@ fun main() {
     startWindow.isResizable = false
 
     val startPanel = StartPanel(3) { event ->
+        if (event is StartPanel.StartPanelEvent.ServerStartEvent) {
+            println("${event.address}:${event.port}")
+
+            return@StartPanel
+        }
+
+        if (!::gameStarter.isInitialized) {
+            gameStarter = GameStarter()
+        }
+
         when (event) {
-            is StartPanel.StartPanelEvent.ServerStartEvent -> {
-                println("${event.address}:${event.port}")
-            }
-
-            is StartPanel.StartPanelEvent.GameStartEvent -> {
-                if (!::gameStarter.isInitialized) {
-                    gameStarter = GameStarter()
-                }
-
+            is StartPanel.StartPanelEvent.GameStartEvent ->
                 gameStarter.start(event.difficulty, event.width, event.height, event.players)
 
-                startWindow.isVisible = false
-            }
-
-            is StartPanel.StartPanelEvent.ConnectEvent -> {
-                println("${event.address}:${event.port}")
-            }
+            is StartPanel.StartPanelEvent.ConnectEvent ->
+                gameStarter.connect(event.address, event.port)
         }
+
+        gameStarter.gameWindow.isVisible = true
+        startWindow.isVisible = false
     }
 
     // val oldStartPanel = OldStartPanel(3, gameStarter.makeCallback(startWindow) {

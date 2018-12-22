@@ -22,12 +22,17 @@ SOFTWARE. */
 
 package ru.byprogminer.Lab_Programming_Addition
 
-import java.awt.Dimension
 import java.util.*
 
 import kotlin.random.Random
 
-open class Game(size: Dimension, difficulty: Difficulty, seed: Long = System.currentTimeMillis()): AbstractGame(size) {
+import ru.byprogminer.Lab_Programming_Addition.util.Dimension
+
+class Game(
+        override val size: Dimension,
+        difficulty: Difficulty,
+        seed: Long = System.currentTimeMillis()
+): AbstractGame() {
 
     enum class Difficulty {
 
@@ -46,7 +51,7 @@ open class Game(size: Dimension, difficulty: Difficulty, seed: Long = System.cur
     }
 
     override var state = State.BEFORE
-        protected set
+        private set
 
     override val players
         get() = _players.toList()

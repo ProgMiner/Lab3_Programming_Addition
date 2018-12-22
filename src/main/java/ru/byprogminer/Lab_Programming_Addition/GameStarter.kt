@@ -27,6 +27,7 @@ import java.awt.Dimension
 import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.KeyListener
+import java.net.Socket
 import java.util.*
 
 import javax.swing.JButton
@@ -54,9 +55,7 @@ open class GameStarter {
     }
 
     open fun start(difficulty: Game.Difficulty, width: Int, height: Int, players: Map<Player, PlayerController>) {
-        if (this::game.isInitialized) {
-            throw RuntimeException("Game is already started")
-        }
+        checkGameNotStarted()
 
         game = Game(width, height, difficulty)
         game.callbacks[AbstractGame.State.AFTER] = ::gameOver
@@ -73,12 +72,28 @@ open class GameStarter {
         }
 
         initGameWindow()
-        gameWindow.isVisible = true
-
         game.start()
     }
 
     open fun restart() {}
+
+    open fun connect(address: String, port: Int) {
+        checkGameNotStarted()
+
+        val socket = Socket(address, port)
+        try {
+            game = ClientGame(socket)
+        } catch (ex: Throwable) {
+            socket.close()
+            throw ex
+        }
+    }
+
+    protected fun checkGameNotStarted() {
+        if (this::game.isInitialized && game.state != AbstractGame.State.BEFORE) {
+            throw RuntimeException("Game is already started")
+        }
+    }
 
     protected fun initGameWindow() {
         gamePanel = GamePanel(game)
@@ -104,7 +119,7 @@ open class GameStarter {
         centerWindow(gameWindow)
     }
 
-    private fun gameOver(game: AbstractGame) {
+    protected fun gameOver(game: AbstractGame) {
         val players = game.players
 
         gameWindow.repaint()
@@ -137,7 +152,7 @@ open class GameStarter {
         }
     }
 
-    private fun winMessage(message: Any) {
+    protected fun winMessage(message: Any) {
         JOptionPane.showMessageDialog(gameWindow, message, "$APP_NAME $APP_VERSION", JOptionPane.INFORMATION_MESSAGE)
     }
 }

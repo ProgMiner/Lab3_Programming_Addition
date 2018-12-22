@@ -27,7 +27,10 @@ import ru.byprogminer.Lab_Programming_Addition.Player.Direction
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 
-class KeyPlayerController(player: Player): PlayerController(player), KeyListener {
+class KeyPlayerController(
+        player: Player,
+        var bindings: Map<Int, Any> = ARROW_BINDINGS
+): PlayerController(player), KeyListener {
 
     companion object {
 
@@ -52,8 +55,6 @@ class KeyPlayerController(player: Player): PlayerController(player), KeyListener
                 KeyEvent.VK_L to Direction.RIGHT
         )
     }
-
-    var bindings = ARROW_BINDINGS
 
     private fun move(event: KeyEvent) {
         val binding = (bindings[event.keyCode] ?: return) as? Direction ?: return

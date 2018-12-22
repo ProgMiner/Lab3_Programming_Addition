@@ -20,8 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
-package ru.byprogminer.Lab_Programming_Addition
+package ru.byprogminer.Lab_Programming_Addition.gui
 
+import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
@@ -31,13 +32,17 @@ import java.util.concurrent.TimeUnit
 
 import javax.swing.*
 
+import ru.byprogminer.Lab_Programming_Addition.APP_NAME
+import ru.byprogminer.Lab_Programming_Addition.GameServer
+import ru.byprogminer.Lab_Programming_Addition.Player
+
 class PlayersWaitPanel(
         gap: Int = 2,
         val gameServer: GameServer,
         private val callback: () -> Unit
 ): JPanel(GridBagLayout()) {
 
-    var maxPlayers = 100000
+    var maxPlayers = 100
 
     private val titleLable = JLabel("Waiting for players", JLabel.CENTER)
     private val playersListModel = DefaultListModel<Player>()
@@ -50,9 +55,10 @@ class PlayersWaitPanel(
         val font = font.deriveFont(20F)
 
         titleLable.font = font
-        add(titleLable, GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
+        add(titleLable, GridBagConstraints(0, 0, 1, 1, 1.0, .0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
 
         playersList.font = font
+        playersList.border = BorderFactory.createLineBorder(Color.GRAY)
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
             val players = gameServer.game.players
 
@@ -68,11 +74,11 @@ class PlayersWaitPanel(
                 }
             }
         }, 0, 10, TimeUnit.MILLISECONDS)
-        add(playersList, GridBagConstraints(0, 1, 1, 1, 1.0, 2.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, Insets(0, 0, 5, 0), 0, 0))
+        add(playersList, GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, Insets(gap, 0, 0, 0), 0, 0))
 
         startButton.font = font
         startButton.addActionListener(this::actionPerformed)
-        add(startButton, GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
+        add(startButton, GridBagConstraints(0, 2, 1, 1, 1.0, .0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
     }
 
     private fun actionPerformed(event: ActionEvent) {

@@ -27,7 +27,12 @@ import java.util.*
 
 import kotlin.random.Random
 
-open class Game(size: Dimension, seed: Long = System.currentTimeMillis()): AbstractGame(size) {
+open class Game(size: Dimension, difficulty: Difficulty, seed: Long = System.currentTimeMillis()): AbstractGame(size) {
+
+    enum class Difficulty {
+
+        EASY, MEDIUM, HARD
+    }
 
     override val blocks: Array<out Array<Block>>
         get() = Arrays.copyOf(_blocks, _blocks.size)
@@ -48,8 +53,8 @@ open class Game(size: Dimension, seed: Long = System.currentTimeMillis()): Abstr
 
     private val _players = mutableListOf<Player>()
 
-    constructor(x: Int, y: Int): this(Dimension(x, y))
-    constructor(x: Int, y: Int, seed: Long): this(Dimension(x, y), seed)
+    constructor(width: Int, height: Int, difficulty: Difficulty): this(Dimension(width, height), difficulty)
+    constructor(width: Int, height: Int, difficulty: Difficulty, seed: Long): this(Dimension(width, height), difficulty, seed)
 
     init {
         makePath(seed)

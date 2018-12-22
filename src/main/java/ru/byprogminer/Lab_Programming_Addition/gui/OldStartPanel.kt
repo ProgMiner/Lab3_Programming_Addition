@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
-package ru.byprogminer.Lab_Programming_Addition
+package ru.byprogminer.Lab_Programming_Addition.gui
 
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -29,16 +29,19 @@ import java.awt.event.ActionEvent
 
 import javax.swing.*
 
-class StartPanel(
+import ru.byprogminer.Lab_Programming_Addition.APP_NAME
+import ru.byprogminer.Lab_Programming_Addition.OldGameStarter
+
+class OldStartPanel(
         gap: Int = 2,
-        private val callback: (Int, Int, GameStarter.GameMode) -> Unit
+        private val callback: (Int, Int, OldGameStarter.GameMode) -> Unit
 ): JPanel(GridBagLayout()) {
 
     var widthRange = 1..100
     var heightRange = 1..100
 
     private val gamemodeLable = JLabel("Game mode:", JLabel.RIGHT)
-    private val gamemodeComboBox = JComboBox<GameStarter.GameMode>(GameStarter.GameMode.values())
+    private val gamemodeComboBox = JComboBox<OldGameStarter.GameMode>(OldGameStarter.GameMode.values())
     private val widthLabel = JLabel("Width:", JLabel.RIGHT)
     private val widthField = JTextField("20", 5)
     private val heightLabel = JLabel("Height:", JLabel.RIGHT)
@@ -61,7 +64,7 @@ class StartPanel(
 
         widthField.font = font
         widthField.addActionListener(this::actionPerformed)
-        add(widthField, GridBagConstraints(1, 1, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
+        add(widthField, GridBagConstraints(1, 1, 1, 1, 2.0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(gap, 0, 0, 0), 0, 0))
 
         heightLabel.font = font
         add(heightLabel, GridBagConstraints(0, 2, 1, 1, .0, 1.0, GridBagConstraints.BASELINE, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 5), 0, 0))

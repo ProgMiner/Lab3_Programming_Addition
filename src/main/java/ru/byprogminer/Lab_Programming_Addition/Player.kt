@@ -39,13 +39,15 @@ open class Player(
 
     companion object {
 
-        val defaultTexture: BufferedImage = ImageIO.read(this::class.java.getResourceAsStream("/assets/images/player.png"))
+        val defaultTexture: BufferedImage = ImageIO.read(Companion::class.java.getResourceAsStream("/assets/images/player.png"))
     }
 
     var game: AbstractGame? = null
         set(value) {
-            if (field != null && value != field) {
-                throw RuntimeException("Change game of player is not permitted")
+            if (value != field) {
+                x = 0
+                y = 0
+                rotation = 1
             }
 
             field = value
@@ -59,9 +61,6 @@ open class Player(
 
     var rotation = 1
         private set
-
-    fun isClean() =
-            game == null && x == 0 && y == 0 && rotation == 1
 
     fun syncWith(player: Player) {
         x = player.x

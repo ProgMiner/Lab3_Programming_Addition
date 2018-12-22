@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
-package ru.byprogminer.Lab_Programming_Addition
+package ru.byprogminer.Lab_Programming_Addition.gui
 
 import java.awt.Color
 import java.awt.GradientPaint
@@ -33,6 +33,10 @@ import java.awt.image.BufferedImage
 import javax.swing.JPanel
 
 import kotlin.math.roundToInt
+
+import ru.byprogminer.Lab_Programming_Addition.AbstractGame
+import ru.byprogminer.Lab_Programming_Addition.Player
+import ru.byprogminer.Lab_Programming_Addition.fixNaN
 
 class GamePanel(game: AbstractGame): JPanel() {
 

@@ -35,52 +35,126 @@ import javax.swing.JOptionPane
 
 import ru.byprogminer.Lab_Programming_Addition.gui.GamePanel
 
-open class GameStarter {
+class OldGameStarter {
 
-    open lateinit var game: AbstractGame
-        protected set
+    enum class GameMode(val text: String) {
+
+        SINGLEPLAYER("Singleplayer"), ONE_COMPUTER("One computer"), MULTIPLAYER("Multiplayer");
+
+        override fun toString() = text
+    }
+
+    var width = 0
+        private set
+
+    var height = 0
+        private set
+
+    var gameMode = GameMode.SINGLEPLAYER
+        private set
 
     val gameWindow = JFrame("$APP_NAME $APP_VERSION")
-    open lateinit var gamePanel: GamePanel
-        protected set
+    lateinit var gamePanel: GamePanel
 
-    protected val players = mutableMapOf<Player, PlayerController>()
+    lateinit var game: AbstractGame
+        private set
+
+    lateinit var gameServer: GameServer
+        private set
+
+    private val keyListeners = mutableSetOf<KeyListener>()
 
     init {
         gameWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         gameWindow.setLocationRelativeTo(null)
         gameWindow.isFocusable = true
-
     }
 
-    open fun start(difficulty: Game.Difficulty, width: Int, height: Int, players: Map<Player, PlayerController>) {
+    fun init(width: Int, height: Int, gameMode: GameMode) {
         if (this::game.isInitialized) {
-            throw RuntimeException("Game is already started")
+            throw RuntimeException("Game is already initialized")
         }
 
-        game = Game(width, height, difficulty)
-        game.callbacks[AbstractGame.State.AFTER] = ::gameOver
+        this.width = width
+        this.height = height
+        this.gameMode = gameMode
 
-        this.players.clear()
-        players.forEach { player, controller ->
-            this.players[player] = controller
-
-            game.joinPlayer(player)
-
-            if (controller is KeyListener) {
-                gameWindow.addKeyListener(controller)
-            }
-        }
-
+        initGame()
         initGameWindow()
-        gameWindow.isVisible = true
 
+        if (gameMode != GameMode.MULTIPLAYER) {
+            gameWindow.isVisible = true
+        }
+    }
+
+    fun start() {
         game.start()
     }
 
-    open fun restart() {}
+    fun makeCallback(startWindow: JFrame, multiplayerCallback: () -> GameServer) = { width: Int, height: Int, gameMode: GameMode ->
+        init(width, height, gameMode)
 
-    protected fun initGameWindow() {
+        if (gameMode == GameMode.MULTIPLAYER) {
+            gameServer = multiplayerCallback()
+        } else {
+            start()
+
+            startWindow.isVisible = false
+        }
+    }
+
+    fun restart() {
+        if (!this::game.isInitialized) {
+            throw RuntimeException("Game is not started")
+        }
+
+        keyListeners.forEach { gameWindow.removeKeyListener(it) }
+        keyListeners.clear()
+
+        initGame()
+
+        gamePanel.game = game
+        game.start()
+    }
+
+    private fun initGame() {
+        game = Game(width, height, Game.Difficulty.EASY)
+        game.callbacks[AbstractGame.State.AFTER] = ::gameOver
+
+        when (gameMode) {
+            GameMode.ONE_COMPUTER -> {
+                val player1 = Player("Player 1")
+                game.joinPlayer(player1)
+
+                val controller1 = KeyPlayerController(player1)
+                controller1.bindings = KeyPlayerController.WASD_BINDINGS
+                gameWindow.addKeyListener(controller1)
+                keyListeners.add(controller1)
+
+                val player2 = Player("Player 2")
+                game.joinPlayer(player2)
+
+                val controller2 = KeyPlayerController(player2)
+                val controller3 = KeyPlayerController(player2)
+                controller3.bindings = KeyPlayerController.HJKL_BINDINGS
+                gameWindow.addKeyListener(controller2)
+                gameWindow.addKeyListener(controller3)
+                keyListeners.add(controller2)
+                keyListeners.add(controller3)
+            }
+
+            else -> {
+                val player = Player()
+                game.joinPlayer(player)
+
+                val controller = KeyPlayerController(player)
+                gameWindow.addKeyListener(controller)
+                keyListeners.add(controller)
+            }
+        }
+    }
+
+    private fun initGameWindow() {
         gamePanel = GamePanel(game)
         gamePanel.background = Color.BLACK
         gamePanel.layout = null
@@ -88,7 +162,9 @@ open class GameStarter {
         val resetButton = JButton("Restart")
         resetButton.bounds = Rectangle(Point(10, 10), resetButton.preferredSize)
         resetButton.isFocusable = false
-        resetButton.addActionListener { restart() }
+        resetButton.addActionListener {
+            restart()
+        }
         gamePanel.add(resetButton)
 
         gameWindow.contentPane = gamePanel

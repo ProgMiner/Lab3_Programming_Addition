@@ -24,38 +24,62 @@ package ru.byprogminer.Lab_Programming_Addition
 
 import java.awt.GraphicsEnvironment
 import java.awt.Rectangle
-import java.net.ServerSocket
 
 import javax.swing.JFrame
+
+import ru.byprogminer.Lab_Programming_Addition.gui.StartPanel
 
 const val APP_NAME = "Lab Programming Addition"
 const val APP_VERSION = "3.0-SNAPSHOT"
 
 private val startWindow = JFrame("$APP_NAME $APP_VERSION")
-private val gameStarter = GameStarter()
+private lateinit var gameStarter: GameStarter
 
 fun main() {
     startWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     startWindow.isResizable = false
 
-    val startPanel = StartPanel(3, gameStarter.makeCallback(startWindow) {
-        val gameServer = GameServer(gameStarter.game, ServerSocket(0xDED))
+    val startPanel = StartPanel(3) { event ->
+        when (event) {
+            is StartPanel.StartPanelEvent.ServerStartEvent -> {
+                println("${event.address}:${event.port}")
+            }
 
-        startWindow.isResizable = true
-        startWindow.contentPane = PlayersWaitPanel(3, gameServer) {
-            startWindow.isVisible = false
+            is StartPanel.StartPanelEvent.GameStartEvent -> {
+                if (!::gameStarter.isInitialized) {
+                    gameStarter = GameStarter()
+                }
 
-            gameStarter.gameWindow.isVisible = true
-            gameStarter.start()
+                gameStarter.start(event.difficulty, event.width, event.height, event.players)
+
+                startWindow.isVisible = false
+            }
+
+            is StartPanel.StartPanelEvent.ConnectEvent -> {
+                println("${event.address}:${event.port}")
+            }
         }
+    }
 
-        startWindow.revalidate()
-        startWindow.pack()
-        startWindow.minimumSize = startWindow.size
+    // val oldStartPanel = OldStartPanel(3, gameStarter.makeCallback(startWindow) {
+    //     val gameServer = GameServer(gameStarter.game, ServerSocket(0xDED))
 
-        gameServer
-    })
+    //     startWindow.isVisible = false
+    //     startWindow.contentPane = PlayersWaitPanel(3, gameServer) {
+    //         startWindow.isVisible = false
 
+    //         gameStarter.gameWindow.isVisible = true
+    //         gameStarter.start()
+    //     }
+
+    //     startWindow.pack()
+    //     startWindow.minimumSize = startWindow.size
+    //     startWindow.isVisible = true
+
+    //     gameServer
+    // })
+
+    // startWindow.contentPane = oldStartPanel
     startWindow.contentPane = startPanel
 
     startWindow.pack()

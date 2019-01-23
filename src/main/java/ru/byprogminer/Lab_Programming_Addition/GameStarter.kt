@@ -51,7 +51,6 @@ open class GameStarter {
         gameWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         gameWindow.setLocationRelativeTo(null)
         gameWindow.isFocusable = true
-
     }
 
     open fun start(difficulty: Game.Difficulty, width: Int, height: Int, players: Map<Player, PlayerController>) {
@@ -82,7 +81,8 @@ open class GameStarter {
 
         val socket = Socket(address, port)
         try {
-            game = ClientGame(socket)
+            game = ClientGame.connectTo(socket)
+            (game as ClientGame).scheduleUpdate()
         } catch (ex: Throwable) {
             socket.close()
             throw ex

@@ -31,10 +31,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-class GameServer(
-        val game: AbstractGame,
-        val socket: ServerSocket
-): Runnable {
+class GameServer(private val socket: ServerSocket): GameStarter(), Runnable {
 
     private inner class SyncSender(val address: SocketAddress): Runnable {
 

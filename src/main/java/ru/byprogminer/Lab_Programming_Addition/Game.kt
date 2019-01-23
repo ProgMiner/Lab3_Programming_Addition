@@ -39,10 +39,10 @@ class Game(
         EASY, MEDIUM, HARD
     }
 
-    override val blocks: Array<out Array<Block>>
+    override val blocks: Array<out Array<out Block>>
         get() = Arrays.copyOf(_blocks, _blocks.size)
 
-    private val _blocks = Array(size.height) { y ->
+    private val _blocks: Array<out Array<Block>> = Array(size.height) { y ->
         when (y) {
             size.height - 1 -> Array(size.width) { Block.GROUND }
             0               -> Array(size.width) { Block.NORMAL }

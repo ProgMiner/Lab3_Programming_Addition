@@ -105,7 +105,7 @@ abstract class AbstractGame {
      * | . . . . . X
      * +----------->
      */
-    abstract val blocks: Array<out Array<Block>>
+    abstract val blocks: Array<out Array<out Block>>
 
     abstract val state: State
 
